@@ -18,10 +18,10 @@ class ErlangDistribution {
 	public:
     ErlangDistribution ();
 	ErlangDistribution (double,double);
-    int getShape(){
+    double getShape(){
     	return shape;
 	}
-	int getLamda(){
+	double getLamda(){
     	return lamda;
 	}
 	
@@ -363,7 +363,7 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 int main(int argc, char *argv[]) {
     int num_ap = 4;
     int N_Simulation = 1000;
-    double file_size = 100; // Mbyte
+    double file_size = 10; // Mbyte
     double bandwidth[num_ap] = {10,50,250,500};
     double count1[num_ap] = {0};
     double count2[num_ap] = {0};
@@ -385,22 +385,29 @@ int main(int argc, char *argv[]) {
     double lamda[num_ap]={0};
     double ni[num_ap]={0};
     double Eni[num_ap]={0};
+    double eeNi[num_ap]={0};
     // generate poisson random number...
     
     cout << "************* Settings *************" << endl;
     cout << "Simulation Rounds :" << N_Simulation << endl;
-    for(int n=0;n<N_Simulation;n++)
-    {
-    cout <<" sim round: "<<(n+1) <<"-th" << endl;
-    //cout << "# of people used : ";
+
     for(int i=0;i<num_ap;i++)
     {
-        lamda[i] = (double)(bandwidth[i]/file_size);
+         lamda[i] = (double)(bandwidth[i]/file_size);
+    }
+
+    for(int n=0;n<N_Simulation;n++)
+    {
+    //cout <<" sim round: "<<(n+1) <<"-th" << endl;
+    //cout << "# of people used : ";
+        for(int i=0;i<num_ap;i++)
+        {
+        //lamda[i] = (double)(bandwidth[i]/file_size);
         //lamda[i] = (double)(file_size/bandwidth[i]);
         ni[i] = rm.poissonRandomNumber(lamda[i]);
         Eni[i]+=ni[i];
        // cout <<" AP"<<i<<"="<<ni[i];
-    }
+        }
     //cout << endl;
         //rm.getListProbability(arr,num_ap);
 
@@ -441,7 +448,7 @@ int main(int argc, char *argv[]) {
     }
     cout << "***********Simulation result****************"<<endl;
     cout << "----- Average # of user E[ni] -----" <<endl;
-    double eeNi[num_ap]={0};
+    
     for(int i=0;i<num_ap;i++)
     {
         double Ani = (double)(Eni[i]/N_Simulation);
@@ -490,6 +497,7 @@ int main(int argc, char *argv[]) {
 	double p2 = 0,psum =0;
     for(int i=0;i<num_ap;i++){
 		// new function
+       // cout << "shape = " <<es[i].getShape() << " lamda="<<es[i].getLamda()<<endl;
 		p2 = getProbValue(es, i,1,num_ap);
 
         Mprob[i]=p2;
