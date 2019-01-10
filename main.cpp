@@ -13,12 +13,12 @@ using namespace std;
 
 
 class ErlangDistribution {
-	double shape;
+	int shape;
 	double lamda;
 	public:
     ErlangDistribution ();
-	ErlangDistribution (double,double);
-    double getShape(){
+	ErlangDistribution (int,double);
+    int getShape(){
     	return shape;
 	}
 	double getLamda(){
@@ -51,7 +51,7 @@ ErlangDistribution::ErlangDistribution () {
 	//srand((unsigned) time(&t)+rand());
 }
 
-ErlangDistribution::ErlangDistribution (double a, double b) {
+ErlangDistribution::ErlangDistribution (int a, double b) {
 	shape = a; // ni
 	lamda = b;
 	time_t t;
@@ -326,7 +326,7 @@ int main(int argc, char *argv[]) {
     int num_ap = 4;
     int N_Simulation = 100000;
     double file_size = 5; // Mbyte
-    double lamda[num_ap]={25,25,25,25};
+    double lamda[num_ap]={10,15,30,45};
     double bandwidth[num_ap] = {10,50,250,500};
     double count1[num_ap] = {0};
     double count2[num_ap] = {0};
@@ -346,7 +346,7 @@ int main(int argc, char *argv[]) {
 
     double arr[num_ap]={0};
     double mu[num_ap]={0};
-    double ni[num_ap]={0};
+    int ni[num_ap]={0};
     double Eni[num_ap]={0};
     double eeNi[num_ap]={0};
     // generate poisson random number...
