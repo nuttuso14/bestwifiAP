@@ -184,13 +184,10 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 		for(int x=0;x<size;x++){
 			if(i!=x)
 			{
-				//cout << "helloooo" <<endl;
 				indexCj[index] = x;
 				index++;
 			}			
 		}
-
-        //cout << "find P[AP"<<i<<"]=min("<<"t"<<indexCj[0]<<",t"<<indexCj[1]<<")"<<endl;
 
         // initial all APs 
         ErlangDistribution er[size];
@@ -204,20 +201,13 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 			sumlamda += er[n+1].getLamda();
         }
 
-        /*for(int x=0;x<size;x++)
-        {
-            cout << "n="<<er[x].getShape()<< " lamda=" << er[x].getLamda() <<endl;
-        }*/
-
         //generate Cj ......
         int upperbound = 0;
         for(int i=1;i<size;i++){
-           // cout << "k =" << k << " n="<< er[i].getShape() << endl;
            // upperbound *= ((k*er[i].getShape())-1);
 		   upperbound+=((k*er[i].getShape())-1);
         }
 		upperbound = upperbound+1;
-       // cout << "there are Cj="<<upperbound <<endl;
 
 		vector<vector<Polynomial>> poly;
 
@@ -232,21 +222,6 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 			}
 			poly.push_back(arr);
 		}
-
-		//print
-		/*cout << "poly size = "<< poly.size() << endl;
-		for(int i=0;i<poly.size();i++){
-			cout << "the " << (i+1) << "th "<<endl;
-			cout << "=============================" <<endl;
-			vector<Polynomial> arr = poly[i];
-			cout << "arr size ="<< arr.size() << endl;
-			for(int j=0;j<arr.size();j++)
-			{
-				Polynomial pl = arr[j];
-				cout << "arr["<<j<<"]="<<pl.getCoefficient() << ", degree: t^" << pl.getDegree() <<endl;
-			}
-			cout << "=============================" <<endl;
-		}*/
 
 		// initial some cj
 		vector<Polynomial> cj; 
@@ -298,11 +273,6 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 				}
 			}
 
-			/*for(int k=0;k<Mj.size();k++)
-			{
-				cout << "Mj["<<k<<"]="<<Mj[k].getCoefficient() << " degree:"<< Mj[k].getDegree() << endl ;
-			}*/	
-
 			//update cj by mj
 			int insertCj = cj.size();
 			//cout << "Mj.size =" << Mj.size() << endl;
@@ -320,9 +290,6 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 					//update
 
 					cj[indicateCj[Mj[m].getDegree()]].setCoefficient(Mj[m].getCoefficient());
-
-					//cj[indicateCj[Mj[m].getDegree()]].setCoefficient(Mj[indicateCj[Mj[m].getDegree()]].getCoefficient());
-				//	cout<< "hhhh:" << cj[indicateCj[Mj[m].getDegree()]].getCoefficient()<<endl;
 				}
 				//cout<< "kkkk"<<endl;
 			}
@@ -337,18 +304,13 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 		{
 			double c21 = fractorial((k*er[0].getShape())+j-1);
 			double c22 = pow(sumlamda,(k*er[0].getShape())+j);
-		//	double c2=((double)(c[j]/fractorial(j)))*c21;
 			double c2=double((cj[j].getCoefficient()*c21)/c22);
-			//cout << "sumlamda="<< sumlamda <<" ,c2=" << c2 <<endl;
-			//cout <<"c"<<j<<"="<<cj[j].getCoefficient()<< " (k"<<i<<"+j-1)!=("<<(k*er[0].getShape())+j-1<<")!="<<c21<< " cj*(k+j-1)!="<<c2<<endl;
 			p+=c2;
 		}
 		//cout << "h(t)="<<p<<endl;
 		double o11 = pow(er[0].getLamda(),(k*er[0].getShape()));
 		double o12 = fractorial((k*(er[0].getShape()))-1);
 		double o1 = o11/o12;
-		//cout << "lamda"<<i<<"^k"<<i<<"="<<eri.getLamda()<<"^"<<eri.getShape()<<"="<<o11<<" (k"<<i<<"-1)!="<<"("<<((eri.getShape())-1)<<")!="<<o12<<" (lamda"<<i<<"^k"<<i<<")/(k"<<i<<"-1)!="<<o1<<endl;
-		//cout << "o1=" << o1 << endl;
 		pi*=(o1*p);
 
     }
@@ -362,8 +324,9 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 
 int main(int argc, char *argv[]) {
     int num_ap = 4;
-    int N_Simulation = 1000;
-    double file_size = 10; // Mbyte
+    int N_Simulation = 100000;
+    double file_size = 5; // Mbyte
+    double lamda[num_ap]={25,25,25,25};
     double bandwidth[num_ap] = {10,50,250,500};
     double count1[num_ap] = {0};
     double count2[num_ap] = {0};
@@ -382,7 +345,7 @@ int main(int argc, char *argv[]) {
     double popsum  = 1;
 
     double arr[num_ap]={0};
-    double lamda[num_ap]={0};
+    double mu[num_ap]={0};
     double ni[num_ap]={0};
     double Eni[num_ap]={0};
     double eeNi[num_ap]={0};
@@ -393,24 +356,25 @@ int main(int argc, char *argv[]) {
 
     for(int i=0;i<num_ap;i++)
     {
-         lamda[i] = (double)(bandwidth[i]/file_size);
+         mu[i] = (double)(bandwidth[i]/file_size);
     }
 
-    for(int n=0;n<N_Simulation;n++)
-    {
+
     //cout <<" sim round: "<<(n+1) <<"-th" << endl;
     //cout << "# of people used : ";
         for(int i=0;i<num_ap;i++)
         {
         //lamda[i] = (double)(bandwidth[i]/file_size);
         //lamda[i] = (double)(file_size/bandwidth[i]);
-        ni[i] = rm.poissonRandomNumber(lamda[i]);
-        Eni[i]+=ni[i];
-       // cout <<" AP"<<i<<"="<<ni[i];
+            ni[i] = rm.poissonRandomNumber(lamda[i]);
+            //ni[i] = rm.poissonRandomNumber(mu[i]);
+            Eni[i]+=ni[i];
+            cout <<" AP"<<i<<"="<<ni[i];
         }
     //cout << endl;
         //rm.getListProbability(arr,num_ap);
-
+    for(int n=0;n<N_Simulation;n++)
+    {
         // without wifi selection
        // cout << "************** Without WIFI Selection **************" <<endl; 
         arr[0]= double(popsum/num_ap);
@@ -426,7 +390,7 @@ int main(int argc, char *argv[]) {
         count1[index]+=1;
         //generate ti
         //cout << lamda[index] <<endl;
-        double ti = rm.erlangRandomnumber(lamda[index],ni[index]+1);
+        double ti = rm.erlangRandomnumber(mu[index],ni[index]+1);
         //cout << "download time ti = " << ti << endl;
         ti1[index]+=ti;
        //cout << "************** With WIFI Selection **************" <<endl; 
@@ -435,14 +399,15 @@ int main(int argc, char *argv[]) {
         double eti[num_ap]={0};
         for(int i=0;i<num_ap;i++)
         {
-            eti[i]=(ni[i]+1)/lamda[i];
+            //eti[i]=(ni[i]+1)/mu[i];
+            eti[i]= rm.erlangRandomnumber(mu[i],(ni[i]+1));
             //cout << " eti["<< i << "]="<<eti[i];
         }
        // cout << endl;
         int selectwifi = FindMinIndex(eti,num_ap);
        // cout << "Select WIFI AP = " << selectwifi << endl;
         count2[selectwifi]+=1;
-        double sti = rm.erlangRandomnumber(lamda[selectwifi],ni[selectwifi]+1);
+        double sti = rm.erlangRandomnumber(mu[selectwifi],ni[selectwifi]+1);
        // cout << "download time ti = " << sti << endl;
         ti2[selectwifi]+=sti;
     }
@@ -451,7 +416,8 @@ int main(int argc, char *argv[]) {
     
     for(int i=0;i<num_ap;i++)
     {
-        double Ani = (double)(Eni[i]/N_Simulation);
+       // double Ani = (double)(Eni[i]/N_Simulation);
+         double Ani = (double)(Eni[i]/1);
         eeNi[i]=Ani;
         cout << "E[n"<<i<<"]="<<Ani << " ";
     }
@@ -488,10 +454,21 @@ int main(int argc, char *argv[]) {
 
     ErlangDistribution es[num_ap]; // generate random variable
 
+    int nn[num_ap]={0};
+
+
 	for(int i=0;i<num_ap;i++){
-		ErlangDistribution e (eeNi[i],lamda[i]);
+        //nn[i]= rm.poissonRandomNumber(eeNi[i]);
+        nn[i]= eeNi[i];
+		ErlangDistribution e (ni[i],mu[i]);
 		es[i]= e;
 	}
+
+    cout << "Generate ni :" ;
+    for(int i=0;i<num_ap;i++){
+        cout << nn[i]<< ",";
+    }
+    cout << endl;
 
     double Mprob[num_ap]={0};
 	double p2 = 0,psum =0;
