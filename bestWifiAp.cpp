@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <iostream>
 #include <cstdio>
 #include <time.h> 
@@ -461,10 +462,12 @@ int main(int argc, char *argv[]) {
         cout <<"Select AP["<<i<<"]="<<count2[i]<<endl;
     }
 
+    double probAP[num_ap] = {0};
     cout << "************* Propability *************" << endl;
     for(int i=0;i<num_ap;i++)
     {
         double p = (double)(count2[i]/N_Simulation);
+        probAP[i]=p;
         //double eti = (double)(ti2[i]/N_Simulation);
         cout <<"P[AP"<<i<<"]="<<p<<endl;
     }
@@ -489,6 +492,43 @@ int main(int argc, char *argv[]) {
         psum+=p2;
     }
     cout <<"Sum of P :"<< psum<<endl;
+
+    // write Text File
+    string content;
+	content = to_string(N_Simulation)+","+to_string(num_ap)+","+to_string(file_size);
+	
+	 for(int i=0;i<num_ap;i++){
+		content+=","+to_string(lamda[i]); 
+	 }
+	  for(int i=0;i<num_ap;i++){
+		content+=","+to_string(mu[i]); 
+	 }
+    for(int i=0;i<num_ap;i++){
+    	content+=","+to_string(probAP[i]);
+	}
+    
+    for(int i=0;i<num_ap;i++){
+    	content+=","+to_string(Mprob[i]);
+	}
+    // diffent ((probAp - Mprob)/probAp)*100
+    for(int i=0;i<num_ap;i++){
+        double diff = abs(probAP[i]-Mprob[i]);
+        double dec = 0;
+        if(probAP[i]!=0)
+        {
+            dec = diff/probAP[i];
+        }
+        else{
+            dec = diff/Mprob[i];
+        }
+        double percent = dec*100;
+        content+=","+to_string(percent);
+    }
+
+	ofstream outfile;
+    outfile.open("result.txt",ios_base::app);
+    outfile << content <<"\n"; 
+    outfile.close();
 
     return 0;
 }
