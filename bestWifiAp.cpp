@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstdio>
 #include <time.h> 
-#include <math.h>
+#include <cmath>
 #include <fstream>
 #include <string>
 #include <sstream>
@@ -500,6 +500,9 @@ int main(int argc, char *argv[]) {
 	 for(int i=0;i<num_ap;i++){
 		content+=","+to_string(lamda[i]); 
 	 }
+     for(int i=0;i<num_ap;i++){
+		content+=","+to_string(bandwidth[i]); 
+	 }
 	  for(int i=0;i<num_ap;i++){
 		content+=","+to_string(mu[i]); 
 	 }
@@ -512,16 +515,25 @@ int main(int argc, char *argv[]) {
 	}
     // diffent ((probAp - Mprob)/probAp)*100
     for(int i=0;i<num_ap;i++){
-        double diff = abs(probAP[i]-Mprob[i]);
+        
         double dec = 0;
-        if(probAP[i]!=0)
+        double percent = 0;
+        if(probAP[i]==Mprob[i])
         {
-            dec = diff/probAP[i];
+            percent = 0;
         }
         else{
-            dec = diff/Mprob[i];
+            double diff = abs(probAP[i]-Mprob[i]);
+            if(probAP[i]!=0)
+            {
+                dec = diff/probAP[i];
+                percent = dec*100;
+            }
+            else{
+                percent = Mprob[i];
+            }
+             
         }
-        double percent = dec*100;
         content+=","+to_string(percent);
     }
 
