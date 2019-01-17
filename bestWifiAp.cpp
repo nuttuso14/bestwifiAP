@@ -522,16 +522,20 @@ int main(int argc, char *argv[]) {
         {
             percent = 0;
         }
-        else{
+        else
+        {
+            //double diff = -1;
             double diff = abs(probAP[i]-Mprob[i]);
-            if(probAP[i]!=0)
+
+            if(probAP[i]==0||Mprob[i]==0)
             {
-                dec = diff/probAP[i];
-                percent = dec*100;
+                dec = diff/(1+Mprob[i]); 
             }
-            else{
-                percent = Mprob[i];
+            else
+            {
+                dec = diff/Mprob[i];
             }
+            percent = dec*100;
              
         }
         content+=","+to_string(percent);
